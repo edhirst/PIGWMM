@@ -1,0 +1,7 @@
+numpy
+scipy
+copy
+matplotlib
+cycler
+torch
+torchvision
