@@ -1,7 +1,7 @@
 # Permutation-Invariant Gaussian Weight Matrix Models  
 Fitting &amp; analysis of Permutation-Invariant Gaussian Matrix Models to Neural Network weight matrices.  
 
-We recommend setting up a new environment for running of this package, the process for this is described in `environment/README.md`.  
+We recommend setting up a new environment for running of this code, the process for this is described in `environment/README.md`.  
 
 Scripts may be run directly from command-line, after editing relevant hyperparameters within the scripts.  
 The script order follows:  
