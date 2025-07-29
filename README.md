@@ -8,8 +8,13 @@ The script order follows:
     1) `WeightMatrix_Generation.py` - to train NNs and save the weight matrices.  
     2) `WeightMatrix_Analysis.py` - to compute PIGMM invariants and parameters.  
     3) `WeightMatrix_Plotting.py` - to generate plots of this data as seen in the paper.  
-...supporting functions may be found in `PIM_Functions.py`.
+...supporting functions may be found in `PIM_Functions.py`.   
 
+In command-line the scripts are run via:
+```
+python3 WeightMatrix_Generation.py
+```
+...and equivalent.   
 
 ## BibTeX Citation  
 ``` 
