@@ -30,7 +30,7 @@ else:
     asymptotic_flag = ''
     num_layer = len(n_hidden)
 #Select more hyperparameters
-file_flag = None          #...eval(sys.argv[6]) : str, a string used in output filenaming if used (to differentiate runs).
+file_flag = ''            #...eval(sys.argv[6]) : str, a string used in output filenaming if used (to differentiate runs).
 number_of_epochs = 50 
 number_of_runs = 1000
 

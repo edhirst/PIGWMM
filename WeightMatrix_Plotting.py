@@ -34,7 +34,7 @@ else:
     asymptotic_flag = ''
     num_layer = len(n_hidden)
 #Select more hyperparameters
-file_flag = None          #...eval(sys.argv[6]) : str, a string used in output filenaming if used (to differentiate runs).
+file_flag = ''            #...eval(sys.argv[6]) : str, a string used in output filenaming if used (to differentiate runs).
 number_of_epochs = 50 
 number_of_runs = 1000
 
@@ -79,6 +79,7 @@ with open(datafile_path,'r') as file:
     model_parameters = np.array(eval(lines[2]))
     Th_invariants = np.array(eval(lines[3]))
 del(lines, file)
+print('--> data imported', flush=True)
 
 ###############################################################################
 #%% #Compute the deviations: |theory-experiment|/stdev(exp)
@@ -128,7 +129,7 @@ fig_legend = plt.figure(figsize=(8,1))
 fig_legend.legend(handles, labels, loc='center', frameon=False, ncol=13)
 plt.axis('off')
 plt.tight_layout()
-plt.savefig(plotpath_root+'Invariants/LQ_Legend.pdf',bbox_inches='tight', pad_inches=0)
+plt.savefig(plotpath_root+'LQ_Legend.pdf',bbox_inches='tight', pad_inches=0)
 
 ############################################################################################################
 #%% #Deviation CQ plotting
@@ -165,7 +166,7 @@ fig_legend = plt.figure(figsize=(8,1))
 fig_legend.legend(handles, labels, loc='center', frameon=False, ncol=13)
 plt.axis('off')
 plt.tight_layout()
-plt.savefig(plotpath_root+'Deviations/CQ_Legend.pdf',bbox_inches='tight', pad_inches=0)
+plt.savefig(plotpath_root+'CQ_Legend.pdf',bbox_inches='tight', pad_inches=0)
 
 ############################################################################################################
 #%% #Normalised changes plotting [(final-initial) over epochs plotting]
@@ -188,7 +189,7 @@ plt.tight_layout()
 plt.savefig(plotpath_root+f'{plot_letters}_CQ_DeviationBars_L{layer_indices[0]+1}.pdf')
 
 #Print normalised changes stats
-normalised_changes = np.array([(Deviations[-1,layer_idx,:] - Deviations[0,layer_idx,:])/(Deviations[-1,layer_idx,:] + Deviations[0,layer_idx,:]) for layer_idx in range(3)])
+normalised_changes = np.array([(Deviations[-1,layer_idx,:] - Deviations[0,layer_idx,:])/(Deviations[-1,layer_idx,:] + Deviations[0,layer_idx,:]) for layer_idx in range(LQ_invariants_avg.shape[1])])
 
 print(f'(min,mean,max):\n{np.min(normalised_changes,axis=1)}\n{np.mean(normalised_changes,axis=1)}\n{np.max(normalised_changes,axis=1)}', flush=True)
 print(f'Absolute (min,mean,max):\n{np.min(np.abs(normalised_changes),axis=1)}\n{np.mean(np.abs(normalised_changes),axis=1)}\n{np.max(np.abs(normalised_changes),axis=1)}', flush=True)
@@ -200,9 +201,9 @@ simple_gaussian_vecs = [0., 0., (1-1/number_of_runs)*init_factor*np.eye(2), init
 pigmm_param_vecs = [[[i[0], i[1], np.array([[i[2], i[3]], [i[3], i[4]]]), np.array([[i[5], i[6], i[7]], [i[6], i[8], i[9]], [i[7], i[9], i[10]]]), i[11], i[12]] for i in model_parameters[j]] for j in range(number_of_epochs+1)]
 
 #Compute Wasserstein distances from the simple gaussian
-wasserstein_dist = np.array([[wasserstein(simple_gaussian_vecs, pigmm_param_vecs[e_idx][l_idx]) for l_idx in range(3)] for e_idx in range(number_of_epochs+1)])
+wasserstein_dist = np.array([[wasserstein(simple_gaussian_vecs, pigmm_param_vecs[e_idx][l_idx]) for l_idx in range(LQ_invariants_avg.shape[1])] for e_idx in range(number_of_epochs+1)])
 #...or from the initial PIGMM (should be the same)
-#init_dist = np.array([[wasserstein(pigmm_param_vecs[0][l_idx], pigmm_param_vecs[e_idx][l_idx]) for l_idx in range(3)] for e_idx in range(number_of_epochs+1)])
+#init_dist = np.array([[wasserstein(pigmm_param_vecs[0][l_idx], pigmm_param_vecs[e_idx][l_idx]) for l_idx in range(LQ_invariants_avg.shape[1])] for e_idx in range(number_of_epochs+1)])
 
 #Composite plots (e.g. unregularised-regularised, asymptotic models \forall \alpha),
 #...are produced by sequentially importing each relevant file, saving 'pigmm_param_vecs' 
@@ -212,7 +213,7 @@ wasserstein_dist = np.array([[wasserstein(simple_gaussian_vecs, pigmm_param_vecs
 
 #Plot Wasserstein distance to simple Gaussian
 plt.figure()
-for layer_idx in range(3):
+for layer_idx in range(LQ_invariants_avg.shape[1]):
     plt.plot(range(number_of_epochs+1), wasserstein_dist[:,layer_idx], label=f'L{layer_idx+1}')
 #plt.ylim(-0.2, 7.2) #...for consistent scales across the plots
 plt.xlabel('Epoch')

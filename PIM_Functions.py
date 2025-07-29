@@ -496,7 +496,8 @@ def Initialisation_Deviation(d=10, N=1000):
 #Wasserstein distance functions
 def matrix_root(matrix):
     evals, evecs = np.linalg.eig(matrix)
-    matrix_root = evecs @ np.diag(np.sqrt(evals)) @ np.transpose(evecs)
+    evals_clipped = np.clip(evals, a_min=0, a_max=None) #...clip near-zero floating point errors
+    matrix_root = evecs @ np.diag(np.sqrt(evals_clipped)) @ np.transpose(evecs)
     return matrix_root
 
 #Define the Wasserstein distance function

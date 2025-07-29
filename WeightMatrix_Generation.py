@@ -29,7 +29,7 @@ else:
     n_hidden = [10,10,10] #...eval(sys.argv[4]) : list, the size of each hidden layer of the NN.
     asymptotic_flag = ''
 #Define more hyperparameters
-file_flag = None          #...eval(sys.argv[5]) : str, a string used in output filenaming if required (to differentiate runs).
+file_flag = ''            #...eval(sys.argv[5]) : str, a string used in output filenaming if required (to differentiate runs).
 batch_size, learning_rate, number_of_epochs = 100, 0.001, 50 
 regularisation_factor = 0 #...other non-zero option used = 0.01.
 number_of_runs = 1000
@@ -100,7 +100,7 @@ for run in range(number_of_runs):
     
     #Train the NN
     if not asymptotic_model:
-        weight_matrices.append([[deepcopy(model[2*idx].weight.detach().numpy()) for idx in range(int(len(model)/2)+1)]])
+        weight_matrices.append([[deepcopy(model[2*idx].weight.detach().numpy()) for idx in range(1,int(len(model)/2)+1)]])
     else:
         weight_matrices.append([[deepcopy(model[2].weight.detach().numpy())]])
     losses.append([])
@@ -138,7 +138,7 @@ for run in range(number_of_runs):
                 total += 1
     test_scores.append(round(correct/total, 3))
     #print(f'\nRun {run+1} Test Accuracy: {test_scores[-1]}',flush=True)
-    del(data,x,y,output,running_loss,loss,epoch,idx,i,batch_idx,layer_idx)
+    del(data,x,y,output,running_loss,loss,epoch,idx,i,batch_idx)
     del(model,layers,optimizer,loss_function)
   
     if run%100 == 0:
