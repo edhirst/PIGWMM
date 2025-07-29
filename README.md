@@ -3,6 +3,7 @@ Fitting &amp; analysis of Permutation-Invariant Gaussian Matrix Models to Neural
 
 We recommend setting up a new environment for running of this code, the process for this is described in `environment/README.md`.  
 
+## Running the code  
 Scripts may be run directly from command-line, after editing relevant hyperparameters within the scripts.  
 The script order follows:  
     1) `WeightMatrix_Generation.py` - to train NNs and save the weight matrices.  
