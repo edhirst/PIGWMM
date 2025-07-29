@@ -476,7 +476,31 @@ def SD_f_full(d, N, Ew2, Ew4):
     
 #Function for computing the PIGMM invariant & parameters means & variations
 def Initialisation_Deviation(d=10, N=1000):
-    #Define the expectation values of indiviual weights to each power: <w^k> = \int w^4 f_{initialisation}(w) dw
+    """
+    Calculates the expected values and uncertainties of invariants and 
+    model parameters for both Gaussian and uniform weight initializations, based on 
+    analytical expressions derived from the theoretical model.
+    
+    Parameters
+    ----------
+    d : int, optional
+        Matrix dimension (number of neurons per layer). Default is 10.
+    N : int, optional
+        Number of runs of the NN for standard error calculations. Default is 1000.
+    
+    Returns
+    -------
+    tuple of (inv_exp, inv_se, param_exp, param_sd)
+        inv_exp : list of ndarray
+            Expected values of LQ invariants for [Gaussian, Uniform] initializations.
+        inv_se : list of ndarray  
+            Standard errors of LQ invariants for [Gaussian, Uniform] initializations.
+        param_exp : list of ndarray
+            Expected values of PIGM-model parameters for [Gaussian, Uniform] initializations.
+        param_sd : list of ndarray
+            Standard deviations of PIGM-model parameters for [Gaussian, Uniform] initializations.
+    """
+    #Define the expectation values of individual weights to each power: <w^k> = \int w^4 f_{initialisation}(w) dw
     Ew = 0
     Ew2_gaussian = 1/d
     Ew4_gaussian = 3/d**2
@@ -495,13 +519,55 @@ def Initialisation_Deviation(d=10, N=1000):
 ############################################################################################################
 #Wasserstein distance functions
 def matrix_root(matrix):
+    """
+    Compute the square root of a symmetric positive semi-definite matrix.
+    
+    Uses eigendecomposition to compute the matrix square root. Negative eigenvalues
+    (typically arising from numerical errors) are clipped to zero to ensure the 
+    result is well-defined.
+    
+    Parameters
+    ----------
+    matrix : ndarray
+        Input square matrix, assumed to be symmetric and positive semi-definite.
+        Shape should be (n, n).
+    
+    Returns
+    -------
+    ndarray
+        Matrix square root of the input matrix. If A is the input matrix,
+        returns B such that B @ B ≈ A.
+    """
     evals, evecs = np.linalg.eig(matrix)
     evals_clipped = np.clip(evals, a_min=0, a_max=None) #...clip near-zero floating point errors
     matrix_root = evecs @ np.diag(np.sqrt(evals_clipped)) @ np.transpose(evecs)
+
     return matrix_root
 
 #Define the Wasserstein distance function
 def wasserstein(param_vec1, param_vec2, d=10.):
+    """
+    Compute the 2-Wasserstein distance between two multivariate Gaussian distributions
+    characterized by their PIGMM parameter vectors.
+    
+    Parameters
+    ----------
+    param_vec1 : array-like
+        Parameter vector for the first distribution. Must contain at least 6 elements:
+        [μ₀, μₕ, V₀⁻¹, Vₕ⁻¹, σ₀², σₕ²] where:
+        - μ₀, μₕ: mean parameters
+        - V₀⁻¹, Vₕ⁻¹: inverse covariance matrices  
+        - σ₀², σₕ²: variance parameters
+    param_vec2 : array-like
+        Parameter vector for the second distribution (same format as param_vec1).
+    d : float, optional
+        Matrix dimension parameter. Default is 10.
+    
+    Returns
+    -------
+    float
+        The 2-Wasserstein distance between the two distributions.
+    """
     #Compute the linear terms
     linear_term = (param_vec1[0]-param_vec2[0])**2 + (param_vec1[1]-param_vec2[1])**2
     #Compute the trace terms

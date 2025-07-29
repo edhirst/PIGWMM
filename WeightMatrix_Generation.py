@@ -121,7 +121,7 @@ for run in range(number_of_runs):
                     
         #Save weight matrices
         if not asymptotic_model:
-            weight_matrices[-1].append([deepcopy(model[2*idx].weight.detach().numpy()) for idx in range(int(len(model)/2)+1)])
+            weight_matrices[-1].append([deepcopy(model[2*idx].weight.detach().numpy()) for idx in range(1,int(len(model)/2)+1)])
         else:
             weight_matrices[-1].append([deepcopy(model[2].weight.detach().numpy())])
         #print(epoch+1,end=' ')
