@@ -1,7 +1,6 @@
 '''Script of functions to compute invariants, and model parameters of the Permutation-Invariant Models'''
 #Import libraries
 import numpy as np
-from scipy.optimize import fsolve
 
 #Define functions to compute experimental invariants of an input square matrix
 def invariants_experimental_LQ(matrix):
@@ -144,13 +143,13 @@ def invariants_experimental_CQ(matrix):
 
 
 #Define function to compute Gaussian model parameters
-def model_params(invariants_input, D=10):
+def model_params(I, D=10):
     '''
     Computes the Gaussian model parameters from the experimental linear and quadratic invariants.
 
     Parameters
     ----------
-    invariants_input : list
+    I : list
         The list of linear and quadratic invariants.
     D : int, optional
         The dimension of the matrices being analysed. The default is 10.
@@ -160,43 +159,42 @@ def model_params(invariants_input, D=10):
     list
         The Gaussian model parameters.
     '''
-    invariants = invariants_input[:13] #...only use the linear and quadratic invariants to compute the model parameters
+    #Run checks that the input data is of the correct format
+    if len(I) != 13:
+        raise ValueError("PIGMM parameters are computed from an invariant list of exactly 13 elements.")
+    if D <= 3:
+        raise ValueError("PIGMM parameter equations are undefined for D <= 3.")
+
+    #Compute common terms
+    sqrt_D_minus_1 = np.sqrt(D - 1)
+    sqrt_D_minus_2 = np.sqrt(D - 2)
     
-    #Define function whose root gives the model parameters
-    def f(y):
-        # <sum_{i} M_{ii}>
-        f1 = y[0] + (np.sqrt(D-1))*y[1] - float(invariants[0])
-        # <sum_{i,j} M_{ij}>
-        f2 = D*y[0] - float(invariants[1])
-        # <sum_{i,j} M_ij M_ij>
-        f3 = y[0]**2 + y[1]**2 + y[2] + y[4] + (D-1)*y[8] + (D-1)*y[10] + (D-1)*y[5] + ((D*(D-3))/2)*y[11] + (((D-1)*(D-2))/2)*y[12] - float(invariants[2])                 
-        # <sum_{i,j} M_ij M_ji>
-        f4 = ((D*(D-3))/2)*y[11] - (((D-1)*(D-2))/2)*y[12] + 2*(D-1)*y[6] + (D-1)*y[10] + y[2] + y[4] + y[0]**2 + y[1]**2 - float(invariants[3])
-        # <sum_{i,j} M_ii M_ij>                                 
-        f5 = y[2] + np.sqrt(D-1)*y[3] + (D-1)*y[6] + (D-1)*y[8] + (D-1)*(np.sqrt(D-2))*y[9] + y[0]**2 + y[0]*y[1]*(np.sqrt(D-1)) - float(invariants[4])                
-        # <sum_{i,j} M_ii M_ji>
-        f6 = y[2] + np.sqrt(D-1)*y[3] + (D-1)*y[6] + (D-1)*y[5] + (D-1)*(np.sqrt(D-2))*y[7] + y[0]**2 + y[0]*y[1]*(np.sqrt(D-1)) - float(invariants[5])                
-        # <sum_{i,j,k} M_ij M_ik>
-        f7 = D*y[2] + D*(D-1)*y[8] + D*(y[0]**2) - float(invariants[6])    
-        # <sum_{i,j,k} M_ij M_kj>
-        f8 = D*y[2] + D*(D-1)*y[5] + D*(y[0]**2) - float(invariants[7])    
-        # <sum_{i,j,k} M_ij M_jk>
-        f9 = D*y[2] + D*(D-1)*y[6] + D*(y[0]**2) - float(invariants[8])    
-        # <sum_{i,j,k,l} M_ij M_kl>
-        f10 = (D**2)*y[2] + (D**2)*(y[0]**2) - float(invariants[9])        
-        # <sum_{i} M_ii M_ii OR (M_ii)^2>
-        f11 = (D**-1)*y[2] + ((D-1)/D)*y[4] + 2*((np.sqrt(D-1))/D)*y[3] + ((D-1)/D)*y[5] + ((D-1)/D)*y[8] + ((D-1)/D)*(D-2)*y[10] + 2*((D-1)/D)*y[6] + 2*((D-1)/D)*(np.sqrt(D-2))*y[7] + 2*((D-1)/D)*(np.sqrt(D-2))*y[9] + ((y[0]**2)/D) + 2*((np.sqrt(D-1))/D)*y[0]*y[1] + ((D-1)/D)*(y[1]**2) - float(invariants[10]) 
-        # <sum_{i,j} M_ii M_jj>
-        f12 = y[2] + (D-1)*y[4] + 2*(np.sqrt(D-1))*y[3] + y[0]**2 + 2*(np.sqrt(D-1))*y[0]*y[1] + (D-1)*(y[1]**2) - float(invariants[11])                        
-        # <sum_{i,j,k} M_{ii} M_{jk}>
-        f13 = D*y[2] + D*(np.sqrt(D-1))*y[3] + D*(y[0]**2) + D*(np.sqrt(D-1))*y[0]*y[1] - float(invariants[12])             
+    #Instantiate the list of params
+    f = [0.0] * 13
     
-        return [f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13]
-        
-    params = fsolve(f, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-    #print(x,'\n',np.isclose(f(x), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])) #...check solver performance
-    
-    return params
+    #Compute the params
+    f[0] = I[1] / D
+    f[1] = (D * I[0] - I[1]) / (D * sqrt_D_minus_1)
+    f[2] = -(I[1]**2 - I[9]) / D**2
+    f[3] = -(D * I[0] * I[1] - I[1]**2 + I[9] - D * I[12]) / (D**2 * sqrt_D_minus_1)
+    f[4] = -(D**2 * I[0]**2 - 2 * D * I[0] * I[1] + I[1]**2 - I[9] - D**2 * I[11] + 2 * D * I[12]) / (D**2 * (D - 1))
+    f[5] = (D * I[7] - I[9]) / (D**2 * (D - 1))
+    f[6] = (D * I[8] - I[9]) / (D**2 * (D - 1))
+    f[7] = (D**2 * I[5] - D * I[7] - D * I[8] + 2 * I[9] - D * I[12]) / (D**2 * (D - 1) * sqrt_D_minus_2)
+    f[8] = (D * I[6] - I[9]) / (D**2 * (D - 1))
+    f[9] = (D**2 * I[4] - D * I[6] - D * I[8] + 2 * I[9] - D * I[12]) / (D**2 * (D - 1) * sqrt_D_minus_2)
+    f[10] = -(
+        2 * D**2 * I[4] + 2 * D**2 * I[5] - D * I[6] - D * I[7]
+        - 2 * D * I[8] + 4 * I[9] - D**3 * I[10] + D**2 * I[11] - 4 * D * I[12]
+    ) / (D**2 * (D - 1) * (D - 2))
+    f[11] = (
+        (D - 1)*(D - 2)*(I[2] + I[3]) + 4*(D - 1)*(I[4] + I[5])
+        - (D - 1)*(I[6] + I[7]) - 2*(D - 1)*I[8] + 2*I[9]
+        - 2*D*(D - 1)*I[10] + 2*I[11] - 4*I[12]
+    ) / (D * (D - 1) * (D - 2) * (D - 3))
+    f[12] = (D * (I[2] - I[3]) - I[6] - I[7] + 2 * I[8]) / (D * (D - 1) * (D - 2))
+
+    return f
 
 
 #Define function to compute the predicted theoretical values of the higher-order invariants from the fitted PIGM-model
