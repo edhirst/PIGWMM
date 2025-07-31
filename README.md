@@ -15,7 +15,7 @@ In command-line the scripts are run via:
 ```
 python3 WeightMatrix_Generation.py
 ```
-...and equivalent.   
+...and equivalent, or may be run in an IDE of your choice (such as VS Code).  
 
 ## BibTeX Citation  
 ``` 
