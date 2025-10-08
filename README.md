@@ -19,5 +19,14 @@ python3 WeightMatrix_Generation.py
 
 ## BibTeX Citation  
 ``` 
-raise NotImplementedError("paper yet to be posted...")
+@article{Hirst:2025lck,
+    author = "Hirst, Edward and Ramgoolam, Sanjaye",
+    title = "{Approximate Gaussianity Beyond Initialisation in Neural Networks}",
+    eprint = "2510.05218",
+    archivePrefix = "arXiv",
+    primaryClass = "cs.LG",
+    reportNumber = "QMUL-PH-25-28",
+    month = "10",
+    year = "2025"
+}
 ```
