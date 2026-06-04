@@ -21,12 +21,16 @@ python3 WeightMatrix_Generation.py
 ``` 
 @article{Hirst:2025lck,
     author = "Hirst, Edward and Ramgoolam, Sanjaye",
-    title = "{Approximate Gaussianity Beyond Initialisation in Neural Networks}",
+    title = "{Approximate Gaussianity beyond initialisation in neural networks}",
     eprint = "2510.05218",
     archivePrefix = "arXiv",
     primaryClass = "cs.LG",
     reportNumber = "QMUL-PH-25-28",
-    month = "10",
-    year = "2025"
+    doi = "10.1088/2632-2153/ae7012",
+    journal = "Mach. Learn. Sci. Tech.",
+    volume = "7",
+    number = "3",
+    pages = "035038",
+    year = "2026"
 }
 ```
